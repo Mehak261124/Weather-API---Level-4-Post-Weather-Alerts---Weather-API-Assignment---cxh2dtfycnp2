@@ -38,7 +38,38 @@ const weatherController = require('../controllers/weatherController');
 
 // Level 4: Post Weather Alerts
 router.post('/alerts', async (req, res) => {
-   // TODO: Implement this function
+  const { city, date, humidity } = req.body;
+  if (!city || !date || !humidity) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Missing required fields: city, date, or humidity',
+    });
+  }
+
+  const alertDetails = { city, date, humidity };
+
+  try {
+    const result = await weatherController.saveWeatherAlert(alertDetails);
+
+    if (result.success) {
+      return res.status(200).json({
+        status: 'success',
+        message: 'Weather alert saved successfully',
+      });
+    } else {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Failed to save weather alert',
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'Failed to save weather alert',
+      error: error.message,
+    });
+  }
 });
 
 module.exports = router;
